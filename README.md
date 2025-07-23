@@ -20,7 +20,7 @@ Buddy/
 ├── py-backend/
 │   ├── server.py
 │   ├── requirements.txt
-│   ├── .env.example
+│   ├── .env
 ├── server/
 │   ├── index.js
 │   ├── package.json
