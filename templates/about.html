@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mb-4">
+  <h1 class="fw-bold">🤝 About Buddy — Your AI Study Partner</h1>
+  <p class="lead">Smarter, faster, and personal — Buddy turns your notes into an intelligent learning system.</p>
+</div>
+
+<!-- What is Buddy -->
+<div class="card shadow-sm p-4 mb-4">
+  <h2 class="mb-3">🧠 What is Buddy?</h2>
+  <p><strong>Buddy is your private AI-powered tutor and study strategist.</strong> It works entirely based on your uploaded study content.</p>
+  <ul>
+    <li>📁 Organize notes from PDFs, DOCX, PPTX, images & scanned materials</li>
+    <li>💬 Ask deep questions grounded in your own content</li>
+    <li>📝 Auto-generate quizzes tailored to your topics</li>
+    <li>📊 View activity logs and progress across sessions</li>
+  </ul>
+  <p class="mt-3 fw-semibold">Think of Buddy as:</p>
+  <ul class="mb-0">
+    <li>📚 A centralized note library</li>
+    <li>🤖 A context-aware AI assistant</li>
+    <li>🧩 A quiz generator trained on your inputs</li>
+    <li>📈 A smart dashboard for study tracking</li>
+  </ul>
+</div>
+
+<!-- How is Buddy Different -->
+<div class="card shadow-sm p-4 mb-4">
+  <h2 class="mb-3">🚀 How is Buddy Different?</h2>
+  <p><strong>Unlike generic AI tools, Buddy is tailored to you.</strong></p>
+  <ul>
+    <li>🗂️ <strong>Upload multiple formats:</strong> PDFs, DOCX, PPTX, images, handwritten scans</li>
+    <li>🧾 <strong>Advanced parsing:</strong> OCR + natural language cleanup = ready-to-query knowledge</li>
+    <li>🎯 <strong>Hyper-relevant answers:</strong> No AI hallucinations. Only what's in your material.</li>
+  </ul>
+  <p><strong>Compared to ChatGPT or Gemini:</strong> They forget your files — Buddy remembers them all.</p>
+</div>
+
+<!-- How it works -->
+<div class="card shadow-sm p-4 mb-4">
+  <h2 class="mb-3">🔄 How It Works — The Buddy Flow</h2>
+  <ol class="mb-0">
+    <li><strong>Upload study material:</strong> Slides, textbooks, notes — any format</li>
+    <li><strong>Clean text extraction:</strong> OCR and parsing engine organize everything</li>
+    <li><strong>Ask context-aware questions:</strong> Get deep answers, no matter the subject</li>
+    <li><strong>Generate dynamic quizzes:</strong> Personalized MCQs, fill-in-the-blanks, or flashcards</li>
+    <li><strong>Track progress visually:</strong> Every action is logged and can be reviewed later</li>
+    <li><strong>Iterate and evolve:</strong> Continuously improve your content and learning path</li>
+  </ol>
+</div>
+
+<!-- Privacy -->
+<div class="card shadow-sm p-4 mb-4">
+  <h2 class="mb-3">🔒 Privacy & Control</h2>
+  <p>Your data stays private and under your control. Files are stored locally or in your secure database. Only minimal context is sent to Gemini for processing.</p>
+  <ul>
+    <li>🔐 You control what’s shared with the AI model</li>
+    <li>🧠 No training happens on your data</li>
+    <li>🔧 Future upgrades will support encryption and on-device models</li>
+  </ul>
+</div>
+
+<!-- CTA -->
+<div class="text-center mt-5">
+  <p class="lead fw-semibold">🎓 Ready to start your smarter study journey?</p>
+  <a href="/upload" class="btn btn-success btn-lg me-2">
+    <i class="fas fa-upload me-1"></i> Upload Notes
+  </a>
+  <a href="/" class="btn btn-outline-primary btn-lg">
+    <i class="fas fa-comments me-1"></i> Start Chatting with Buddy
+  </a>
+</div>
+{% endblock %}
