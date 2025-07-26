@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mb-4">
+  <h1>📂 Buddy Library</h1>
+  <p class="lead">Browse your uploaded notes, slides, PDFs, and images — neatly organized and ready to assist your study flow.</p>
+</div>
+
+{% if files %}
+<div class="table-responsive">
+  <table class="table table-hover table-bordered align-middle table-library" id="library-table">
+    <thead class="table-primary text-center">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">📄 File Name</th>
+        <th scope="col">📦 Type</th>
+        <th scope="col">📅 Uploaded</th>
+        <th scope="col">⚙️ Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for file in files %}
+      <tr>
+        <td class="text-center fw-bold">{{ file[0] }}</td>
+        <td>{{ file[1] }}</td>
+        <td class="text-center">
+          <span class="badge bg-secondary text-uppercase">{{ file[2] }}</span>
+        </td>
+        <td class="text-muted">{{ file[4] }}</td>
+        <td class="text-center">
+          <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <a href="/preview/{{ file[0] }}" class="btn btn-sm btn-outline-primary" title="Preview this file">
+              <i class="fas fa-eye"></i> View
+            </a>
+            <a href="/download/{{ file[0] }}" class="btn btn-sm btn-outline-success" title="Download file">
+              <i class="fas fa-download"></i> Download
+            </a>
+            <button class="btn btn-sm btn-outline-danger" title="Delete this file" onclick="confirmDelete('{{ file[0] }}', '{{ file[1] }}')">
+              <i class="fas fa-trash-alt"></i> Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center">
+  No files uploaded yet. <a href="/upload" class="alert-link">Upload something now!</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(fileId, fileName) {
+  Swal.fire({
+    title: "Are you sure?",
+    html: `You are about to delete <strong>${fileName}</strong> (ID: ${fileId}).<br>This action is permanent.`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#dc3545",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/delete/${fileId}`, {
+        method: "DELETE"
+      }).then(res => {
+        if (res.ok) {
+          Swal.fire("Deleted!", "The file has been removed.", "success").then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire("Error!", "Failed to delete the file.", "error");
+        }
+      });
+    }
+  });
+}
+</script>
+{% endblock %}
