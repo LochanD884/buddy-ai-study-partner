@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="text-center mb-4">
+    <h1 class="fw-bold">💬 Buddy — Your AI Study Partner</h1>
+    <p class="lead">Ask Buddy anything based on your uploaded notes and get precise, context-aware help.</p>
+    <p class="text-muted">
+      New here? <a href="/about">Learn how Buddy works</a>.
+    </p>
+  </div>
+
+  <div id="chat-box" class="chat-box mb-4 p-3 border rounded bg-light overflow-auto">
+    <div class="text-muted text-center">Start your conversation with Buddy…</div>
+  </div>
+
+  <form id="chat-form" class="row g-2 align-items-center">
+    <div class="col-10">
+      <input
+        type="text"
+        id="question"
+        class="form-control"
+        placeholder="Type your question and press Enter or click Ask..."
+        autocomplete="off"
+        aria-label="Ask Buddy a question"
+      />
+    </div>
+    <div class="col-2 d-grid">
+      <button type="submit" class="btn btn-primary">Ask</button>
+    </div>
+  </form>
+
+  <div class="text-center mt-4">
+    <p class="text-muted">
+      Want to upload more study material? <a href="/upload">Upload now</a>.
+    </p>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const chatBox = document.getElementById("chat-box");
+  const chatForm = document.getElementById("chat-form");
+  const questionInput = document.getElementById("question");
+
+  function appendMessage(content, sender = 'user') {
+    const message = document.createElement("div");
+    message.className = `chat-bubble mb-2 p-3 rounded ${sender === 'user' ? 'bg-primary text-white text-end ms-auto' : 'bg-white border text-start me-auto'}`;
+    message.innerHTML = renderMarkdown(content);
+    chatBox.appendChild(message);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function appendComplexityBadge(time, space) {
+    const badge = document.createElement("div");
+    badge.className = "complexity-badge";
+    badge.innerHTML = `
+      ⏱ <strong>Time Complexity:</strong> ${time} &nbsp;&nbsp;
+      💾 <strong>Space Complexity:</strong> ${space}
+    `;
+    chatBox.appendChild(badge);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function showLoading() {
+    const loader = document.createElement("div");
+    loader.className = "bot-loader text-muted d-flex align-items-center gap-2";
+    loader.innerHTML = `<div class="spinner-border spinner-border-sm"></div> Buddy is thinking...`;
+    loader.id = "loading-message";
+    chatBox.appendChild(loader);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function removeLoading() {
+    const loader = document.getElementById("loading-message");
+    if (loader) loader.remove();
+  }
+
+  chatForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    appendMessage(question, 'user');
+    questionInput.value = '';
+    showLoading();
+
+    try {
+      const response = await fetch("/ask-buddy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      });
+
+      const data = await response.json();
+      removeLoading();
+
+      if (data.answer) {
+        appendMessage(data.answer, 'bot');
+
+        // Optional: show complexity if exists
+        if (data.time_complexity || data.space_complexity) {
+          appendComplexityBadge(data.time_complexity || 'N/A', data.space_complexity || 'N/A');
+        }
+
+      } else {
+        appendMessage("🤖 I couldn't find an answer. Try rephrasing or uploading more notes.", 'bot');
+      }
+    } catch (err) {
+      console.error("Buddy Error:", err);
+      removeLoading();
+      appendMessage("⚠️ Failed to connect to Buddy. Please try again later.", 'bot');
+    }
+  });
+
+  // Handle Enter vs Shift+Enter
+  questionInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      chatForm.dispatchEvent(new Event("submit"));
+    }
+  });
+
+  function renderMarkdown(text) {
+    return text
+      .replace(/```\s*([\s\S]*?)\s*```/g, '<pre class="bg-light p-2 rounded border"><code>$1</code></pre>')
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>")
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\n/g, "<br>");
+  }
+});
+</script>
+
+<style>
+.chat-box {
+  height: 400px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+}
+.chat-bubble code {
+  background: #e8ecef;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.complexity-badge {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background-color: #e9f3ff;
+  border-left: 4px solid #0d6efd;
+  margin-top: 10px;
+}
+</style>
+{% endblock %}
