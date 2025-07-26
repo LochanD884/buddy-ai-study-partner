@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mb-4">
+  <h1 class="fw-bold">🧠 Quiz Yourself with Buddy</h1>
+  <p class="lead">Test your knowledge with AI-generated questions from your uploaded notes.</p>
+</div>
+
+<!-- === Generate Quiz Section === -->
+<div class="card shadow-sm p-4 mb-4">
+  <h3 class="mb-2">🎯 Generate a Quiz</h3>
+  <p class="text-muted">Click the button below to create a new quiz based on your study material.</p>
+  <button id="generate-quiz-btn" class="btn btn-primary w-100 mb-3">
+    <i class="fas fa-magic me-2"></i> Generate New Quiz
+  </button>
+  <div id="quiz-loading-indicator" class="text-center text-muted d-none">
+    <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+    <span>Buddy is creating your quiz...</span>
+  </div>
+</div>
+
+{% if questions %}
+<script id="quiz-data" type="application/json">
+  {{ questions | tojson | safe }}
+</script>
+{% endif %}
+
+<!-- === Quiz Display Section === -->
+<div id="quiz-display-area" class="quiz-section mt-4">
+  {% if questions %}
+    <h2 class="mb-3">📝 Your Quiz Questions</h2>
+    <form id="quiz-form">
+      {% for question in questions %}
+      <div class="card mb-3 p-3">
+        <p class="quiz-question mb-2 fw-bold">{{ loop.index }}. {{ question.question_text }}</p>
+        <div class="quiz-options">
+          {% for option in question.options %}
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="question_{{ question.id }}"
+                   id="option_{{ question.id }}_{{ loop.index }}"
+                   value="{{ option | trim }}">
+            <label class="form-check-label" for="option_{{ question.id }}_{{ loop.index }}">
+              {{ option | trim }}
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-success mt-3">
+        <i class="fas fa-check-circle me-2"></i> Submit Answers
+      </button>
+    </form>
+    <div id="quiz-results" class="mt-4"></div>
+  {% else %}
+    <div class="alert alert-info text-center">
+      No quizzes available yet. Click <strong>Generate New Quiz</strong> to get started!
+    </div>
+  {% endif %}
+</div>
+
+<!-- === Scripts === -->
+<script>
+(function () {
+  function debugLog(message, data = '') {
+    console.log('[DEBUG]', message, data);
+  }
+
+  function showError(message) {
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger mt-3';
+    alert.textContent = message;
+    const area = document.getElementById('quiz-display-area');
+    if (area) area.appendChild(alert);
+    setTimeout(() => alert.remove(), 5000);
+  }
+
+  function getScoreClass(score) {
+    return score >= 70 ? 'alert-success' : score >= 50 ? 'alert-warning' : 'alert-danger';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    debugLog('Quiz page loaded');
+
+    const generateQuizBtn = document.getElementById('generate-quiz-btn');
+    const quizLoading = document.getElementById('quiz-loading-indicator');
+    const quizForm = document.getElementById('quiz-form');
+    const quizResults = document.getElementById('quiz-results');
+
+    // --- Quiz Generation ---
+    generateQuizBtn?.addEventListener('click', () => {
+      debugLog('Generating quiz...');
+      generateQuizBtn.disabled = true;
+      quizLoading.classList.remove('d-none');
+
+      fetch('/generate-quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(data => {
+          debugLog('Quiz data received:', data);
+          if (data.success) location.reload();
+          else throw new Error(data.message || 'Quiz generation failed');
+        })
+        .catch(err => showError(err.message || 'Failed to connect'))
+        .finally(() => {
+          generateQuizBtn.disabled = false;
+          quizLoading.classList.add('d-none');
+        });
+    });
+
+    // --- Quiz Submission ---
+    quizForm?.addEventListener('submit', e => {
+      e.preventDefault();
+      debugLog('Submitting quiz...');
+
+      const formData = new FormData(quizForm);
+      const rawData = document.getElementById('quiz-data')?.textContent;
+      let quizData = [];
+
+      try {
+        quizData = JSON.parse(rawData);
+      } catch (err) {
+        console.error('[ERROR] Invalid quiz JSON', err);
+        return showError('Invalid quiz data.');
+      }
+
+      let correct = 0;
+      const total = quizData.length;
+      let resultHTML = `<div class="card p-3"><h4>Your Results:</h4>`;
+
+      quizData.forEach((q, idx) => {
+        const selected = formData.get(`question_${q.id}`);
+        const isCorrect = selected === q.correct_answer;
+        if (isCorrect) correct++;
+
+        resultHTML += `
+          <div class="mb-3 p-2 border-bottom">
+            <p class="mb-1 fw-semibold">${idx + 1}. ${q.question_text}</p>
+            <p class="${isCorrect ? 'text-success' : 'text-danger'} mb-1">
+              Your answer: ${selected || 'Not answered'}
+            </p>
+            ${!isCorrect ? `<p class="text-muted mb-0">Correct answer: ${q.correct_answer}</p>` : ''}
+          </div>`;
+      });
+
+      const score = Math.round((correct / total) * 100);
+      resultHTML += `
+        <div class="alert ${getScoreClass(score)} mt-3 fw-bold">
+          🎯 Score: ${correct}/${total} (${score}%)
+        </div>
+      </div>`;
+
+      quizResults.innerHTML = resultHTML;
+      quizResults.scrollIntoView({ behavior: 'smooth' });
+
+      debugLog('Score:', { correct, total, score });
+    });
+  });
+})();
+</script>
+{% endblock %}
