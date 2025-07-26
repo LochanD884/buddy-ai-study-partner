@@ -15,17 +15,29 @@ Unlike generic chatbots, Buddy minimizes hallucinations by grounding every answe
 
 ```plaintext
 Buddy/
-├── public/
-├── src/
-├── py-backend/
+│
+├── app/
 │   ├── server.py
-│   ├── requirements.txt
-│   ├── .env
-├── server/
-│   ├── index.js
-│   ├── package.json
-│   ├── package-lock.json
-├── .gitignore
+│
+├── templates/
+│   ├── base.html
+│   ├── index.html
+│   ├── upload.html
+│   ├── library.html
+│   ├── progress.html
+│   ├── quiz.html
+│   ├── about.html
+│
+├── static/
+│   ├── style.css
+│   └── script.js
+│
+├── uploads/
+│
+├── buddy.db
+│
+├── requirements.txt
+├── .env
 ├── README.md
 ```
 
