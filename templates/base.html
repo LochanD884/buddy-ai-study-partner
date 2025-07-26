@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Buddy — Your AI Study Partner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- SEO Meta -->
+  <meta name="description" content="Buddy is your intelligent study partner powered by AI. Upload notes, ask questions, generate quizzes, and track progress." />
+  <meta name="theme-color" content="#0d6efd" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
+
+  <!-- Preload Fonts or Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-MQ6hMH7yKTGg+lTWqG/j/4mvOWSVK+zVkpJ+xzqk+IRkfzp7eTigWl7Z2qKJ1/5b" crossorigin="anonymous">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    integrity="sha512-papWAFNpTZM2zS9K3g8E9zgTK7zRHDMXA/NZ4KsIxmVWeXv8eV5OrL4Z9W5qIFqW4vJuw3ME/NFVw8vU7PeyWQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Complexity Badges Style (optional preview if needed) -->
+  <style>
+    .complexity-badge {
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background-color: #f8f9fa;
+      border-left: 4px solid #0d6efd;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- === Navbar === -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm" aria-label="Buddy Main Navigation">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/">
+        <i class="fas fa-brain me-1"></i> Buddy
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/upload">Upload</a></li>
+          <li class="nav-item"><a class="nav-link" href="/library">Library</a></li>
+          <li class="nav-item"><a class="nav-link" href="/progress">Progress</a></li>
+          <li class="nav-item"><a class="nav-link" href="/quiz">Quiz</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+        </ul>
+        <span class="navbar-text text-white small d-none d-lg-inline">
+          Built with <i class="fa-solid fa-bolt"></i> Gemini + Flask
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- === Main Content === -->
+  <main class="container py-4" role="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- === Footer === -->
+  <footer class="text-center text-muted small py-4 border-top mt-4">
+    <div class="container">
+      <p class="mb-1">&copy; {{ 2025 }} <strong>Buddy</strong> — AI Study Partner</p>
+      <p class="mb-0">Made with ❤️ for smart learners</p>
+    </div>
+  </footer>
+
+  <!-- === Bootstrap JS Bundle === -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-hUuG+l7T+y9RhQq0kZ7WZ7oypl0dB41MuN2M0ghxkJhBbMx6KoFwLxK+uKw9UwYj"
+    crossorigin="anonymous"></script>
+
+  <!-- SweetAlert for future alerts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Custom Scripts (per-page support) -->
+  {% block scripts %}{% endblock %}
+</body>
+</html>
