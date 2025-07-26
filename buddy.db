@@ -1,0 +1,77 @@
+-- === USERS (for multi-user support if needed) ===
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT UNIQUE,
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- === UPLOADS ===
+CREATE TABLE IF NOT EXISTS uploads (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER DEFAULT NULL,
+    filename TEXT NOT NULL,
+    filetype TEXT NOT NULL,
+    filepath TEXT NOT NULL,
+    extracted_text TEXT,
+    summary TEXT,
+    tags TEXT,
+    source_url TEXT,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- === QUIZ ===
+CREATE TABLE IF NOT EXISTS quiz (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    related_upload_id INTEGER,
+    question TEXT NOT NULL,
+    options TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    explanation TEXT,
+    difficulty TEXT DEFAULT 'medium',
+    topic TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (related_upload_id) REFERENCES uploads(id) ON DELETE CASCADE
+);
+
+-- === QUIZ ATTEMPTS (logs user interaction with quizzes) ===
+CREATE TABLE IF NOT EXISTS quiz_attempts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    quiz_id INTEGER,
+    user_id INTEGER,
+    selected_option TEXT,
+    is_correct INTEGER DEFAULT 0,
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- === PROGRESS (log user & system actions) ===
+CREATE TABLE IF NOT EXISTS progress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    related_upload_id INTEGER,
+    user_id INTEGER,
+    action TEXT NOT NULL,
+    detail TEXT, -- extra info or metadata (optional)
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (related_upload_id) REFERENCES uploads(id) ON DELETE SET NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- === CHAT HISTORY (optional per-session chat tracking) ===
+CREATE TABLE IF NOT EXISTS chat_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    question TEXT NOT NULL,
+    response TEXT NOT NULL,
+    used_context TEXT, -- optionally store the context chunk used
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- === Indexes for faster queries ===
+CREATE INDEX IF NOT EXISTS idx_uploads_user_id ON uploads(user_id);
+CREATE INDEX IF NOT EXISTS idx_quiz_related_upload ON quiz(related_upload_id);
+CREATE INDEX IF NOT EXISTS idx_progress_upload_user ON progress(related_upload_id, user_id);
+CREATE INDEX IF NOT EXISTS idx_chat_history_user_id ON chat_history(user_id);
