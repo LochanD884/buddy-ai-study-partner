@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mb-4">
+  <h1 class="fw-bold">⬆️ Upload Your Study Material</h1>
+  <p class="lead">Bring your notes, slides, PDFs, and images into <strong>Buddy's brain</strong> to start learning smart.</p>
+</div>
+
+<!-- Upload Form -->
+<div class="card shadow-sm p-4 mb-4 upload-form">
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="file" class="form-label fw-semibold">Select File</label>
+      <input type="file" class="form-control" id="file" name="file" required>
+      <div class="form-text text-muted">Supported formats: <strong>TXT, PDF, DOCX, PPTX, JPG, JPEG, PNG</strong></div>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">
+      <i class="fas fa-upload me-1"></i> Upload File
+    </button>
+  </form>
+
+  {% if message %}
+    <div class="alert alert-success mt-4">
+      <i class="fas fa-check-circle me-1"></i> {{ message }}
+      
+      {% if extracted_text %}
+        <hr class="my-3" />
+        <p class="fw-bold mb-1">🧠 Extracted Text Preview:</p>
+        <div class="card bg-light text-muted small p-3 mt-2">
+          {{ extracted_text[:200] }}{% if extracted_text|length > 200 %}...{% endif %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+<!-- Navigation Note -->
+<div class="alert alert-info text-center mt-4">
+  🎯 After uploading, visit the <a href="/library" class="alert-link">Library</a> to see your files or the 
+  <a href="/" class="alert-link">Home</a> to chat with Buddy!
+</div>
+{% endblock %}
