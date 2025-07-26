@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mb-4">
+  <h1>📈 Buddy Progress Log</h1>
+  <p class="lead">Track your entire study journey — uploads, questions, quizzes and more.</p>
+</div>
+
+{% if logs %}
+<div class="table-responsive">
+  <table class="table table-hover table-bordered align-middle table-library text-center">
+    <thead class="table-primary">
+      <tr>
+        <th scope="col">🆔 ID</th>
+        <th scope="col">📝 Action</th>
+        <th scope="col">⏱️ Timestamp</th>
+        <th scope="col">📄 Related File</th>
+        <th scope="col">⏳ Time</th>
+        <th scope="col">📦 Space</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td class="fw-bold">{{ log[0] }}</td>
+        <td>
+          {% set action = log[1].lower() %}
+          {% if "upload" in action %}
+            <span class="badge bg-success"><i class="fas fa-upload me-1"></i> {{ log[1] }}</span>
+          {% elif "ask" in action %}
+            <span class="badge bg-info text-dark"><i class="fas fa-question-circle me-1"></i> {{ log[1] }}</span>
+          {% elif "generate" in action or "quiz" in action %}
+            <span class="badge bg-warning text-dark"><i class="fas fa-lightbulb me-1"></i> {{ log[1] }}</span>
+          {% else %}
+            <span class="badge bg-secondary"><i class="fas fa-cogs me-1"></i> {{ log[1] }}</span>
+          {% endif %}
+        </td>
+        <td class="text-muted small">{{ log[2] }}</td>
+        <td>
+          {% if log[3] %}
+            <span class="text-primary fw-semibold" title="Source file">{{ log[3] }}</span>
+          {% else %}
+            <span class="text-muted">N/A</span>
+          {% endif %}
+        </td>
+        <td><span class="badge bg-light text-dark">O(n)</span></td>
+        <td><span class="badge bg-light text-dark">O(1)</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info text-center">
+  No progress logged yet. Start by <a href="/upload" class="alert-link">uploading a file</a> or <a href="/" class="alert-link">asking Buddy a question</a>!
+</div>
+{% endif %}
+{% endblock %}
